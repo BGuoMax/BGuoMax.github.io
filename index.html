@@ -1,11 +1,175 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>BGuoMax</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>English Word Counter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+      background: #f7f7f8;
+      color: #111;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 28px;
+    }
+    p {
+      line-height: 1.6;
+    }
+    textarea {
+      width: 100%;
+      min-height: 260px;
+      padding: 16px;
+      font-size: 16px;
+      line-height: 1.6;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .stat {
+      background: #f3f4f6;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .label {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 6px;
+    }
+    .value {
+      font-size: 26px;
+      font-weight: bold;
+    }
+    .buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-size: 15px;
+      cursor: pointer;
+      background: #111;
+      color: white;
+    }
+    button.secondary {
+      background: #e5e7eb;
+      color: #111;
+    }
+    .note {
+      margin-top: 14px;
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
 </head>
 <body>
-  <h1>Hello, this is BGuoMax's website.</h1>
-  <p>My GitHub Pages site is working.</p>
+  <div class="card">
+    <h1>English Word Counter</h1>
+    <p>Paste or type English text below. The page will automatically count words, characters, sentences, and paragraphs.</p>
+    <textarea id="text" placeholder="Type or paste your English text here..."></textarea>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="label">Words</div>
+        <div class="value" id="wordCount">0</div>
+      </div>
+      <div class="stat">
+        <div class="label">Characters</div>
+        <div class="value" id="charCount">0</div>
+      </div>
+      <div class="stat">
+        <div class="label">Characters (no spaces)</div>
+        <div class="value" id="charNoSpaceCount">0</div>
+      </div>
+      <div class="stat">
+        <div class="label">Sentences</div>
+        <div class="value" id="sentenceCount">0</div>
+      </div>
+      <div class="stat">
+        <div class="label">Paragraphs</div>
+        <div class="value" id="paragraphCount">0</div>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button onclick="copyText()">Copy Text</button>
+      <button class="secondary" onclick="clearText()">Clear</button>
+    </div>
+
+    <div class="note">
+      规则说明：默认按英文单词规则统计，支持 apostrophes 和连字符，例如 don't、well-known 会按一个词处理。 <br>
+      Rule: contractions and hyphenated forms such as don't and well-known are counted as one word.
+    </div>
+  </div>
+
+  <script>
+    const textEl = document.getElementById('text')
+    const wordCountEl = document.getElementById('wordCount')
+    const charCountEl = document.getElementById('charCount')
+    const charNoSpaceCountEl = document.getElementById('charNoSpaceCount')
+    const sentenceCountEl = document.getElementById('sentenceCount')
+    const paragraphCountEl = document.getElementById('paragraphCount')
+
+    function countWords(text) {
+      const matches = text.match(/[A-Za-z]+(?:['’-][A-Za-z]+)*/g)
+      return matches ? matches.length : 0
+    }
+
+    function countSentences(text) {
+      const matches = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g)
+      return matches ? matches.filter(s => s.trim().length > 0).length : 0
+    }
+
+    function countParagraphs(text) {
+      const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0)
+      return paragraphs.length
+    }
+
+    function updateCounts() {
+      const text = textEl.value
+      wordCountEl.textContent = countWords(text)
+      charCountEl.textContent = text.length
+      charNoSpaceCountEl.textContent = text.replace(/\s/g, '').length
+      sentenceCountEl.textContent = text.trim() ? countSentences(text) : 0
+      paragraphCountEl.textContent = text.trim() ? countParagraphs(text) : 0
+    }
+
+    function clearText() {
+      textEl.value = ''
+      updateCounts()
+    }
+
+    async function copyText() {
+      try {
+        await navigator.clipboard.writeText(textEl.value)
+      } catch (e) {
+        alert('Copy failed')
+      }
+    }
+
+    textEl.addEventListener('input', updateCounts)
+    updateCounts()
+  </script>
 </body>
 </html>
